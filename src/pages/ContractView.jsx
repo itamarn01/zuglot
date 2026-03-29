@@ -240,7 +240,7 @@ const ContractView = () => {
 
       <div ref={contractRef} style={{ maxWidth: 820, margin: '0 auto', background: '#fff', borderRadius: 16, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}>
         {/* Header */}
-        <div style={{ background: 'linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)', padding: '36px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="responsive-padding responsive-flex" style={{ background: 'linear-gradient(135deg,#1a1a2e 0%,#16213e 100%)' }}>
           <div>
             {contract.logoUrl && <img src={contract.logoUrl} alt="logo" style={{ height: 60, marginBottom: 8, borderRadius: 4 }} />}
             {/* <h1 style={{ fontFamily: 'Assistant,sans-serif', fontSize: '2.8rem', color: '#EAB21B', letterSpacing: 6, fontWeight: 900 }}>KOLOT</h1>
@@ -252,7 +252,7 @@ const ContractView = () => {
           </div>
         </div>
 
-        <div style={{ padding: '36px 40px' }}>
+        <div className="responsive-padding">
           {/* Event Title */}
           <div style={{ textAlign: 'center', marginBottom: 32, paddingBottom: 24, borderBottom: '2px solid #f0f2f5' }}>
             <h2 style={{ fontSize: '1.8rem', color: '#1a1a2e', fontFamily: 'Georgia,serif' }}>
@@ -297,7 +297,7 @@ const ContractView = () => {
               )}
             </div>
           )}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
+          <div className="contract-grid" style={{ marginBottom: 28 }}>
             <div style={{ background: '#f8f9fb', padding: 20, borderRadius: 12, border: '1px solid #e8eaf0' }}>
               <h3 style={{ color: '#EAB21B', marginBottom: 14, fontFamily: 'Georgia,serif', letterSpacing: 1 }}>{tx.eventDetails}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -592,7 +592,7 @@ const ContractView = () => {
                 <div style={{ color: '#333' }}>{tx.signedBy} <strong>{contract.signerName || signerName}</strong></div>
                 {contract.signedAt && <div style={{ fontSize: '0.85rem', color: '#666', marginTop: 4 }}>{tx.signedAt} {new Date(contract.signedAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}</div>}
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: contract.bandSignatures?.length > 1 ? `repeat(${contract.bandSignatures.length},1fr) 1fr` : '1fr 1fr', background: '#fff', padding: '24px 28px', gap: 20, borderTop: '1px solid #e8f5e9' }}>
+              <div className="contract-grid" style={{ background: '#fff', padding: '16px clamp(16px, 4vw, 28px)', borderTop: '1px solid #e8f5e9' }}>
                 {/* Band signatures */}
                 {contract.bandSignatures && contract.bandSignatures.length > 0 ? (
                   contract.bandSignatures.map((sig, i) => (
@@ -627,9 +627,9 @@ const ContractView = () => {
               </div>
             </div>
           ) : (
-            <div style={{ border: '2px dashed #EAB21B', borderRadius: 14, padding: 28, marginBottom: 28, fontFamily: 'Assistant,sans-serif' }}>
+            <div style={{ border: '2px dashed #EAB21B', borderRadius: 14, padding: 'clamp(16px, 4vw, 28px)', marginBottom: 28, fontFamily: 'Assistant,sans-serif' }}>
               <h3 style={{ textAlign: 'center', marginBottom: 24, color: '#1a1a2e', fontWeight: 800 }}>{tx.signTitle}</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+              <div className="contract-grid">
                 {/* Band signatures (pre-sign view) */}
                 {contract.bandSignatures && contract.bandSignatures.length > 0 ? (
                   <div style={{ textAlign: 'center' }}>
