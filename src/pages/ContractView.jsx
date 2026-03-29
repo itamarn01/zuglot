@@ -425,8 +425,8 @@ const ContractView = () => {
           )}
 
           {/* Price Summary */}
-          <div style={{background:'linear-gradient(135deg,#1a1a2e,#16213e)',borderRadius:14,padding:28,marginBottom:28,color:'#fff'}}>
-            <div style={{fontSize:'0.9rem',color:'#81C7D5',marginBottom:16}}>{tx.paymentTitle}</div>
+          <div style={{background:'linear-gradient(135deg,#1a1a2e,#16213e)',borderRadius:14,padding:28,marginBottom:28,color:'#fff',fontFamily:'Assistant,sans-serif'}}>
+            <div style={{fontSize:'1rem',fontWeight:700,color:'#81C7D5',marginBottom:16,letterSpacing:0.5}}>{tx.paymentTitle}</div>
             {basePrice>0&&(
               <div style={{display:'flex',justifyContent:'space-between',marginBottom:8,fontSize:'0.95rem',color:'#ccc'}}>
                 <span>{tx.packagePrice}</span>
@@ -455,43 +455,170 @@ const ContractView = () => {
                 <span>₪{contract.advancePayment.toLocaleString()}</span>
               </div>
             )}
+            <div style={{marginTop:16,paddingTop:14,borderTop:'1px solid rgba(255,255,255,0.1)',fontSize:'0.85rem',color:'#ccc',lineHeight:1.8}}>
+              <div style={{marginBottom:8}}>הסכום לתשלום הוא <strong style={{color:'#fff'}}>כולל מע"מ</strong>, כתשלום מלא עבור שרותיה הבסיסיים (לא כולל תוספות כלשהן).</div>
+              <div style={{display:'flex',alignItems:'flex-start',gap:8}}>
+                <span style={{color:'#EAB21B',flexShrink:0,fontSize:'1rem'}}>•</span>
+                <span>התשלום יתבצע מיד לאחר סיום האירוע במזומן או בצ׳ק ליום האירוע.</span>
+              </div>
+            </div>
+            {optionalProds.length>0&&(
+              <div style={{marginTop:12,padding:'12px 14px',background:'rgba(234,178,27,0.08)',borderRadius:8,fontSize:'0.82rem',color:'#bbb',lineHeight:1.75,borderRight:'3px solid #EAB21B'}}>
+                <strong style={{color:'#EAB21B',display:'block',marginBottom:4}}>תשלום עבור תוספות:</strong>
+                התשלום עבור התוספות עפ״י סעיף זה לעיל (ככל שיחולו) הינו כולל מע״מ ויבוצע אף הוא מיד בסיום האירוע במזומן.
+                {' '}(יחד עם התשלום עפ״י סעיף ׳סכום ותנאי תשלום׳ לעיל).
+              </div>
+            )}
           </div>
 
           {/* Special Notes */}
           {contract.specialNotes&&(
-            <div style={{background:'#fff8e1',padding:20,borderRadius:12,marginBottom:28,border:'1px solid #ffe082'}}>
+            <div style={{background:'#fff8e1',padding:20,borderRadius:12,marginBottom:28,border:'1px solid #ffe082',fontFamily:'Assistant,sans-serif'}}>
               <strong style={{color:'#795548'}}>{tx.notes}</strong><br/>
               <span style={{color:'#333'}}>{contract.specialNotes}</span>
             </div>
           )}
 
-          {/* Signature Section */}
+          {/* ── ABOUT THE BAND ── */}
+          <div style={{marginBottom:24,borderRadius:14,overflow:'hidden',boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
+            <div style={{background:'linear-gradient(135deg,#1a1a2e,#16213e)',padding:'14px 22px',display:'flex',alignItems:'center',gap:12}}>
+              <span style={{fontSize:'1.4rem'}}>🎵</span>
+              <h3 style={{color:'#EAB21B',fontFamily:'Assistant,sans-serif',fontWeight:800,fontSize:'1.05rem',margin:0}}>מזל טוב - קצת עלינו</h3>
+            </div>
+            <div style={{padding:'20px 22px',background:'#f8f9fb',fontFamily:'Assistant,sans-serif',color:'#2a2a3e',lineHeight:1.85,fontSize:'0.93rem',direction:'rtl'}}>
+              <p style={{margin:'0 0 10px'}}>להקת ׳קולות׳ היא להקה מהמובילות בעולם האירועים והחתונות. הלהקה משלבת בין סגנונות רבים ומביאה לבמה מוסיקה איכותית ברמה גבוהה תוך הבאת אנרגיות מטורפות של שמחה אמיתית לאירוע שלכם!</p>
+              <p style={{margin:'0 0 10px'}}>הלהקה מורכבת ממוסיקאים מקצועיים עתירי נסיון במה, ועומדת בסטנדרטים גבוהים מאוד של סאונד וציוד.</p>
+              <p style={{margin:'0 0 10px'}}>׳קולות׳ שמה לה למטרה לשלב בין מקצועיות ברמת איכות בלתי מתפשרת, יוקרה ועמידה בסטנדרטים גבוהים יחד עם אנרגיות ושמחה ללא גבולות.</p>
+              <p style={{margin:0,fontWeight:700,color:'#EAB21B'}}>נשמח לקחת חלק באירוע שלכם 🎶</p>
+            </div>
+          </div>
+
+          {/* ── WEDDING DETAILS ── */}
+          <div style={{marginBottom:24,borderRadius:14,overflow:'hidden',boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
+            <div style={{background:'linear-gradient(135deg,#1a1a2e,#16213e)',padding:'14px 22px',display:'flex',alignItems:'center',gap:12}}>
+              <span style={{fontSize:'1.4rem'}}>💍</span>
+              <h3 style={{color:'#EAB21B',fontFamily:'Assistant,sans-serif',fontWeight:800,fontSize:'1.05rem',margin:0}}>פרטי החתונה - מה זה כולל</h3>
+            </div>
+            <div style={{padding:'20px 22px',background:'#f8f9fb',fontFamily:'Assistant,sans-serif',direction:'rtl'}}>
+              {[
+                'המחיר הבסיסי כולל נגינה ליד כיסא כלה, וכן בעת ליווי החתן והכלה לחופה, נגינה של כל ההרכב בזמן החופה. לאחר מכן, נגינת שירי רקע בזמן המנה הראשונה, ונגינה בסבבי ההרקדות.',
+                `זמן נגינת הלהקה הינו ${contract.performanceDuration||4.5} שעות מזמן תחילת הנגינה בכסא כלה/בחופה. שעת ההתחלה תיקבע בפגישה בין הצדדים.`,
+                'במידה וירצה המזמין שהלהקה תנגן מעבר לשעה זו, ישלם המזמין תוספת של 10% (מהמחיר הכולל) לכל חצי שעה נוספת. (המחיר כולל שימוש בהגברה)'
+              ].map((item,i)=>(
+                <div key={i} style={{display:'flex',gap:12,marginBottom:10,padding:'11px 14px',background:'#fff',borderRadius:8,border:'1px solid #eef0f5',fontSize:'0.92rem',color:'#2a2a3e',lineHeight:1.75}}>
+                  <span style={{background:'#1a1a2e',color:'#EAB21B',borderRadius:'50%',minWidth:26,height:26,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.8rem',flexShrink:0,marginTop:1}}>{['א','ב','ג'][i]}</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── SOUND SYSTEM ── */}
+          <div style={{marginBottom:24,borderRadius:14,overflow:'hidden',boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
+            <div style={{background:'linear-gradient(135deg,#1a1a2e,#16213e)',padding:'14px 22px',display:'flex',alignItems:'center',gap:12}}>
+              <span style={{fontSize:'1.4rem'}}>🔊</span>
+              <h3 style={{color:'#EAB21B',fontFamily:'Assistant,sans-serif',fontWeight:800,fontSize:'1.05rem',margin:0}}>הגברה</h3>
+            </div>
+            <div style={{padding:'20px 22px',background:'#f8f9fb',fontFamily:'Assistant,sans-serif',direction:'rtl'}}>
+              {[
+                'הלהקה תדאג לספק מערכת הגברה מתאימה לרחבת הריקודים וכן לרמקול נוסף ברחבת הנשים במידת הצורך.',
+                'הלהקה תדאג לספק מערכת הגברה לחופה, מיקרופון לעורך החופה ולמוזיקת רקע מתאימה וכן למערכת הגברה נוספת ליד כסא הכלה.',
+                'שעת הקמת ציוד ההגברה באולם היא כשעתיים וחצי לפני שעת קבלת פנים. על המזמין לוודא שהאולם פנוי בשעה זו, וזאת ע"מ שחברת ההגברה תוכל להתחיל מייד עם הגעתה למקום ללא עיכובים.',
+                'בכל מקרה אחר אשר ההגברה שתסופק איננה מצד הלהקה, יבוצע תאום מול הלהקה על מנת להתאים את המפרט הנדרש ללהקה.',
+                `זמן השימוש בהגברה הינו ${contract.performanceDuration||4.5} שעות מזמן תחילת הנגינה בכסא כלה/בחופה. שעת ההתחלה תיקבע בפגישה בין הצדדים.`,
+                'במידה וירצה המזמין להשתמש בהגברה להשמעת מוסיקה מעבר לשעה זו, ישלם המזמין תוספת של 500 ₪ לכל חצי שעה נוספת.',
+                'השימוש במערכת ההגברה עבור ספק חיצוני (כגון להקה או דיג׳יי) כרוך בתשלום. הצעת מחיר תישלח לפי הדרישה.'
+              ].map((item,i)=>(
+                <div key={i} style={{display:'flex',gap:12,marginBottom:10,padding:'11px 14px',background:'#fff',borderRadius:8,border:'1px solid #eef0f5',fontSize:'0.92rem',color:'#2a2a3e',lineHeight:1.75}}>
+                  <span style={{background:'#1a1a2e',color:'#EAB21B',borderRadius:'50%',minWidth:26,height:26,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.8rem',flexShrink:0,marginTop:1}}>{['א','ב','ג','ד','ה','ו','ז'][i]}</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── CANCELLATION ── */}
+          <div style={{marginBottom:28,borderRadius:14,overflow:'hidden',boxShadow:'0 2px 12px rgba(0,0,0,0.06)',border:'1px solid #ffd5d5'}}>
+            <div style={{background:'linear-gradient(135deg,#2d1414,#3a1818)',padding:'14px 22px',display:'flex',alignItems:'center',gap:12}}>
+              <span style={{fontSize:'1.4rem'}}>📋</span>
+              <h3 style={{color:'#ff9090',fontFamily:'Assistant,sans-serif',fontWeight:800,fontSize:'1.05rem',margin:0}}>ביטול</h3>
+            </div>
+            <div style={{padding:'20px 22px',background:'#fff8f8',fontFamily:'Assistant,sans-serif',direction:'rtl'}}>
+              <p style={{fontSize:'0.92rem',color:'#555',marginBottom:14,fontWeight:600,lineHeight:1.6}}>מוסכם בזאת, כי בכל מקרה של ביטול, יחולו הוראות סימן זה לחוזה.</p>
+              {[
+                'הלהקה תדאג לנגנים/זמר חלופיים בגין אי הופעתם למעט אי הופעתם מחמת כח עליון.',
+                'במקרה של ביטול עקב כוח עליון, רשאי המזמין לשנות את הרכב הלהקה או לבטל את ההסכם ללא דמי ביטול. במידה והמזמין יבחר לדחות את מועד האירוע, יתואם מועד חלופי שבו הלהקה תוכל להופיע והמקדמה ששולמה תועבר למועד החדש.',
+              ].map((item,i)=>(
+                <div key={i} style={{display:'flex',gap:12,marginBottom:10,padding:'11px 14px',background:'#fff',borderRadius:8,border:'1px solid #ffe4e4',fontSize:'0.92rem',color:'#2a2a3e',lineHeight:1.75}}>
+                  <span style={{background:'#c0392b',color:'#fff',borderRadius:'50%',minWidth:26,height:26,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.8rem',flexShrink:0,marginTop:1}}>{['א','ב'][i]}</span>
+                  <span>{item}</span>
+                </div>
+              ))}
+              <div style={{padding:'14px',background:'#fff',borderRadius:8,border:'1px solid #ffe4e4',marginBottom:4}}>
+                <div style={{display:'flex',gap:12,alignItems:'flex-start'}}>
+                  <span style={{background:'#c0392b',color:'#fff',borderRadius:'50%',minWidth:26,height:26,display:'flex',alignItems:'center',justifyContent:'center',fontWeight:800,fontSize:'0.8rem',flexShrink:0,marginTop:1}}>ג</span>
+                  <div style={{fontSize:'0.92rem',color:'#2a2a3e',lineHeight:1.75}}>
+                    <div style={{marginBottom:10,fontWeight:500}}>כל ביטול של חוזה זה מצדו של המזמין למעט מחמת כוח עליון ולמעט ביטול או דחיית האירוע מחמת המצב הביטחוני:</div>
+                    <div style={{display:'flex',flexDirection:'column',gap:6}}>
+                      {[
+                        {label:'תוך 30 ימים לפני האירוע', pct:'30%'},
+                        {label:'תוך 3 שבועות לפני האירוע', pct:'50%'},
+                        {label:'תוך 7 ימים לפני האירוע', pct:'100%'},
+                      ].map((x,j)=>(
+                        <div key={j} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'7px 14px',background:'#fff5f5',borderRadius:6,border:'1px solid #ffd0d0'}}>
+                          <span style={{color:'#555',fontWeight:500}}>{x.label}</span>
+                          <span style={{fontWeight:800,color:'#c0392b',fontSize:'1rem'}}>{x.pct} <span style={{fontWeight:400,fontSize:'0.85rem',color:'#888'}}>מסך ההזמנה</span></span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── SIGNATURE SECTION ── */}
           {contract.status==='signed'||signed ? (
-            <div style={{textAlign:'center',padding:28,background:'linear-gradient(135deg,#e8f5e9,#f1f8e9)',borderRadius:14,border:'2px solid #4CAF50'}}>
-              <div style={{fontSize:'1.3rem',fontWeight:700,color:'#4CAF50',marginBottom:8}}>{tx.signed}</div>
-              <div style={{color:'#333'}}>{tx.signedBy} <strong>{contract.signerName}</strong></div>
-              {contract.signedAt&&<div style={{fontSize:'0.85rem',color:'#666',marginTop:4}}>{tx.signedAt} {new Date(contract.signedAt).toLocaleDateString(lang==='he'?'he-IL':'en-US')}</div>}
-              {contract.signatureUrl&&<img src={contract.signatureUrl} alt="חתימה" style={{maxWidth:200,marginTop:16,border:'1px solid #ddd',borderRadius:8,background:'#fff',padding:4}}/>}
-              <div style={{marginTop:20}}>
-                <button onClick={printPDF} style={{padding:'10px 24px',background:'#1a1a2e',color:'#EAB21B',border:'none',borderRadius:8,fontWeight:700,cursor:'pointer',fontSize:'0.95rem'}}>
+            <div style={{borderRadius:14,overflow:'hidden',border:'2px solid #4CAF50',marginBottom:28,fontFamily:'Assistant,sans-serif'}}>
+              <div style={{background:'linear-gradient(135deg,#e8f5e9,#f1f8e9)',padding:'18px 28px',textAlign:'center'}}>
+                <div style={{fontSize:'1.3rem',fontWeight:800,color:'#2e7d32',marginBottom:4}}>{tx.signed}</div>
+                <div style={{color:'#333'}}>{tx.signedBy} <strong>{contract.signerName||signerName}</strong></div>
+                {contract.signedAt&&<div style={{fontSize:'0.85rem',color:'#666',marginTop:4}}>{tx.signedAt} {new Date(contract.signedAt).toLocaleDateString(lang==='he'?'he-IL':'en-US')}</div>}
+              </div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',background:'#fff',padding:'24px 28px',gap:28,borderTop:'1px solid #e8f5e9'}}>
+                <div style={{textAlign:'center'}}>
+                  <div style={{marginBottom:8,fontWeight:600,color:'#666',fontSize:'0.85rem'}}>{tx.bandRep}</div>
+                  <div style={{padding:'14px 12px',borderBottom:'2px solid #1a1a2e',fontFamily:'Georgia,cursive',fontSize:'1.5rem',color:'#EAB21B',letterSpacing:3}}>Kolot</div>
+                </div>
+                <div style={{textAlign:'center'}}>
+                  <div style={{marginBottom:8,fontWeight:600,color:'#666',fontSize:'0.85rem'}}>{tx.client}</div>
+                  {contract.signatureUrl ? (
+                    <img src={contract.signatureUrl} alt="חתימת לקוח"
+                      style={{maxWidth:'100%',height:72,objectFit:'contain',border:'1px solid #ddd',borderRadius:6,background:'#fff',padding:4,display:'block',margin:'0 auto 4px'}}/>
+                  ) : (
+                    <div style={{height:72,border:'1px dashed #ccc',borderRadius:6,display:'flex',alignItems:'center',justifyContent:'center',color:'#999',fontSize:'0.8rem',margin:'0 auto 4px'}}>חתימה לא נמצאה</div>
+                  )}
+                  <div style={{borderTop:'2px solid #1a1a2e',paddingTop:4,fontSize:'0.82rem',color:'#555',fontWeight:600}}>{contract.signerName||signerName}</div>
+                </div>
+              </div>
+              <div style={{background:'#f8f9fb',padding:'14px 28px',textAlign:'center',borderTop:'1px solid #e8f5e9'}}>
+                <button onClick={printPDF} style={{padding:'10px 28px',background:'#1a1a2e',color:'#EAB21B',border:'none',borderRadius:8,fontWeight:700,cursor:'pointer',fontSize:'0.95rem',fontFamily:'Assistant,sans-serif'}}>
                   📄 {lang==='he'?'הורד PDF':'Download PDF'}
                 </button>
               </div>
             </div>
           ):(
-            <div style={{border:'2px dashed #EAB21B',borderRadius:14,padding:28}}>
-              <h3 style={{textAlign:'center',marginBottom:24,color:'#1a1a2e',fontFamily:'Georgia,serif'}}>{tx.signTitle}</h3>
+            <div style={{border:'2px dashed #EAB21B',borderRadius:14,padding:28,marginBottom:28,fontFamily:'Assistant,sans-serif'}}>
+              <h3 style={{textAlign:'center',marginBottom:24,color:'#1a1a2e',fontWeight:800}}>{tx.signTitle}</h3>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:28}}>
-                {/* Band signature */}
                 <div style={{textAlign:'center'}}>
                   <div style={{marginBottom:12,fontWeight:700,color:'#1a1a2e'}}>{tx.bandRep}</div>
                   <div style={{padding:'12px',borderBottom:'2px solid #1a1a2e',fontFamily:'Georgia,cursive',fontSize:'1.4rem',color:'#EAB21B',letterSpacing:2}}>Kolot</div>
                 </div>
-                {/* Client signature */}
                 <div style={{textAlign:'center'}}>
                   <div style={{marginBottom:12,fontWeight:700,color:'#1a1a2e'}}>{tx.client}</div>
                   {!signing?(
-                    <button onClick={()=>setSigning(true)} style={{padding:'14px 36px',background:'#EAB21B',border:'none',borderRadius:10,fontWeight:800,fontSize:'1rem',cursor:'pointer',boxShadow:'0 4px 16px rgba(234,178,27,0.4)',transition:'all 0.2s',color:'#000'}}
+                    <button onClick={()=>setSigning(true)} style={{padding:'14px 36px',background:'#EAB21B',border:'none',borderRadius:10,fontWeight:800,fontSize:'1rem',cursor:'pointer',boxShadow:'0 4px 16px rgba(234,178,27,0.4)',transition:'all 0.2s',color:'#000',fontFamily:'Assistant,sans-serif'}}
                       onMouseEnter={e=>e.currentTarget.style.transform='translateY(-2px)'}
                       onMouseLeave={e=>e.currentTarget.style.transform='translateY(0)'}>
                       ✍️ {tx.signHere}
@@ -506,8 +633,8 @@ const ContractView = () => {
                         onTouchStart={startDraw} onTouchMove={draw} onTouchEnd={stopDraw}/>
                       <div style={{fontSize:'0.75rem',color:'#aaa',marginTop:4,marginBottom:10}}>{lang==='he'?'חתמו כאן במסגרת האפורה':'Sign above'}</div>
                       <div style={{display:'flex',gap:8,justifyContent:'center'}}>
-                        <button onClick={submitSign} style={{padding:'10px 24px',background:'#4CAF50',color:'#fff',border:'none',borderRadius:8,fontWeight:700,cursor:'pointer',fontSize:'0.9rem'}}>{tx.confirmSign}</button>
-                        <button onClick={clearSig} style={{padding:'10px 16px',background:'#f0f2f5',border:'none',borderRadius:8,cursor:'pointer',color:'#333'}}>{tx.clear}</button>
+                        <button onClick={submitSign} style={{padding:'10px 24px',background:'#4CAF50',color:'#fff',border:'none',borderRadius:8,fontWeight:700,cursor:'pointer',fontSize:'0.9rem',fontFamily:'Assistant,sans-serif'}}>{tx.confirmSign}</button>
+                        <button onClick={clearSig} style={{padding:'10px 16px',background:'#f0f2f5',border:'none',borderRadius:8,cursor:'pointer',color:'#333',fontFamily:'Assistant,sans-serif'}}>{tx.clear}</button>
                       </div>
                     </div>
                   )}
