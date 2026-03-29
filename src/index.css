@@ -686,3 +686,72 @@ tbody td a {
   color: var(--accent-cyan);
   text-decoration: underline;
 }
+
+/* Responsive Utilities */
+.responsive-padding {
+  padding: 36px 40px;
+}
+@media (max-width: 768px) {
+  .responsive-padding { padding: 24px 20px; }
+}
+
+.responsive-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+@media (max-width: 768px) {
+  .responsive-flex {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+}
+
+.responsive-flex-start {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+@media (max-width: 768px) {
+  .responsive-flex-start {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+.responsive-title {
+  font-size: 2.8rem;
+}
+@media (max-width: 768px) {
+  .responsive-title { font-size: 2rem; }
+}
+
+.responsive-text {
+  font-size: 1.4rem;
+}
+@media (max-width: 768px) {
+  .responsive-text { font-size: 1.1rem; }
+}
+
+/* Fix grid layouts for mobile/tablet */
+@media (max-width: 1024px) {
+  .main-content {
+    margin-right: 0;
+    padding: 16px;
+  }
+  .page-header {
+    margin-top: 50px; /* Space for the mobile hamburger menu */
+  }
+}
+
+.contract-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 768px) {
+  .contract-grid {
+    grid-template-columns: 1fr;
+  }
+}

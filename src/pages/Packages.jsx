@@ -174,7 +174,7 @@ const Packages = () => {
               </div>
               <div className="form-group"><label className="form-label">תיאור</label><input className="form-input" value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))}/></div>
               
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:16,marginTop:16}}>
+              <div className="grid-2" style={{gap:16,marginTop:16}}>
                 {/* Included Products */}
                 <div>
                   <h4 style={{color:'var(--accent-cyan)',marginBottom:10,fontSize:'0.9rem',display:'flex',alignItems:'center',gap:6}}>

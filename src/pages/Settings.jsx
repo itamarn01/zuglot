@@ -111,7 +111,7 @@ const Settings = () => {
               <FiSave/> {saved?'נשמר ✓':saving?'שומר...':'שמור'}
             </button>
           </div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:24,alignItems:'start'}}>
+          <div className="grid-2" style={{alignItems:'start'}}>
             {/* Logo Upload */}
             <div>
               <label className="form-label">לוגו הלהקה (מוצג בחוזה ובטופס)</label>

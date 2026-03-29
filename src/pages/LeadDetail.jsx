@@ -132,8 +132,8 @@ const LeadDetail = () => {
             </div>
           ) : (
             <div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px 24px'}}>
-                {[['סוג',lead.eventType],['תאריך',lead.eventDate?new Date(lead.eventDate).toLocaleDateString('he-IL'):'-'],['לוקיישן',lead.location||'-'],['בטיפול',lead.handler?.name||'-'],['מחיר',lead.proposedPrice?`₪${lead.proposedPrice.toLocaleString()}`:'-'],['מקור',lead.source==='form'?'טופס':'ידני'],['איך שמעו',lead.howHeardAboutUs||'-'],['מי המליץ',lead.referredBy||'-']].map(([l,v])=>(
+              <div className="grid-2" style={{gap:'12px 24px'}}>
+                {[['סוג',lead.eventType],['תאריך',lead.eventDate?new Date(lead.eventDate).toLocaleDateString('he-IL'):'-'],['לוקיישן',lead.location||'-'],['בטיפול',lead.handler?.name||'-'],['מחיר',lead.proposedPrice?`₪${lead.proposedPrice.toLocaleString()}`:'-'],['מקור',lead.source==='form'?'טופס':'ידני'],['איך שמעו',lead.howHeardAboutUs||'-'],['מי המליץ',lead.referredBy||'-']].map(([l,v]) => (
                   <div key={l}><span className="text-muted" style={{fontSize:'0.8rem'}}>{l}</span><div>{v}</div></div>
                 ))}
               </div>
