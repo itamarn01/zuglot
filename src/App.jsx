@@ -9,6 +9,7 @@ import Products from './pages/Products';
 import Packages from './pages/Packages';
 import Contracts from './pages/Contracts';
 import ContractView from './pages/ContractView';
+import AuthCallback from './pages/AuthCallback';
 import Settings from './pages/Settings';
 import CalendarPage from './pages/CalendarPage';
 import PublicForm from './pages/PublicForm';
@@ -29,6 +30,7 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/form" element={<PublicForm />} />
       <Route path="/contract/:linkToken" element={<ContractView />} />
       <Route path="/*" element={
