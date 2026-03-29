@@ -15,6 +15,8 @@ const ContractView = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const contractRef = useRef(null);
   const [lang, setLang] = useState('he'); // 'he' or 'en'
+  const [editing, setEditing] = useState(false);
+  const [editedFields, setEditedFields] = useState({});
 
   const t = {
     he: {
@@ -31,10 +33,13 @@ const ContractView = () => {
       orderer: 'המזמין:',
       address: 'כתובת:',
       phone: 'טלפון:',
+      idNumber: 'ת.ז:',
       groom: 'שם חתן:',
       bride: 'שם כלה:',
-      paymentTitle: 'סכום ותנאי תשלום',
+      duration: 'זמן נגינה:',
+      hours: 'שעות',
       packagePrice: 'מחיר חבילה:',
+      paymentTitle: 'סכום ותנאי תשלום',
       discount: 'הנחה מיוחדת:',
       extras_total: 'תוספות שנבחרו:',
       finalPrice: 'סכום סופי:',
@@ -71,10 +76,13 @@ const ContractView = () => {
       orderer: 'Orderer:',
       address: 'Address:',
       phone: 'Phone:',
+      idNumber: 'ID:',
       groom: 'Groom:',
       bride: 'Bride:',
-      paymentTitle: 'Payment Terms',
+      duration: 'Performance duration:',
+      hours: 'hours',
       packagePrice: 'Package price:',
+      paymentTitle: 'Payment Terms',
       discount: 'Special discount:',
       extras_total: 'Selected add-ons:',
       finalPrice: 'Total:',
@@ -106,9 +114,32 @@ const ContractView = () => {
     try {
       const {data} = await api.get(`/contracts/public/${linkToken}`);
       setContract(data);
+      setEditedFields({
+        eventDate: data.eventDate ? new Date(data.eventDate).toISOString().split('T')[0] : '',
+        eventLocation: data.eventLocation || '',
+        performanceDuration: data.performanceDuration || 4.5,
+        ordererName: data.ordererName || '',
+        ordererIdNumber: data.ordererIdNumber || '',
+        ordererAddress: data.ordererAddress || '',
+        ordererPhone: data.ordererPhone || '',
+        groomName: data.groomName || '',
+        brideName: data.brideName || '',
+      });
     } catch(e) {
       if(e.response?.status === 403) setExpired(true);
     } finally { setLoading(false); }
+  };
+
+  const saveEdits = async () => {
+    try {
+      await api.patch(`/contracts/public/${linkToken}/update-details`, editedFields);
+      setContract(c => ({...c, ...editedFields,
+        eventDate: editedFields.eventDate ? new Date(editedFields.eventDate).toISOString() : c.eventDate
+      }));
+      setEditing(false);
+    } catch(e) {
+      alert(lang==='he'?'שגיאה בשמירה':'Save failed');
+    }
   };
 
   const startDraw = (e) => {
@@ -231,23 +262,95 @@ const ContractView = () => {
           </div>
 
           {/* Event Details */}
+          {contract.status !== 'signed' && !signed && (
+            <div style={{display:'flex',justifyContent:'center',marginBottom:16,gap:10}}>
+              {!editing ? (
+                <button onClick={()=>setEditing(true)}
+                  style={{padding:'8px 22px',background:'#1a1a2e',color:'#EAB21B',border:'2px solid #EAB21B',borderRadius:10,fontWeight:700,cursor:'pointer',fontSize:'0.9rem'}}>
+                  {'\u270F\uFE0F'} {lang==='he'?'עריכת פרטים':'Edit Details'}
+                </button>
+              ) : (
+                <div style={{display:'flex',gap:8}}>
+                  <button onClick={saveEdits}
+                    style={{padding:'8px 22px',background:'#4CAF50',color:'#fff',border:'none',borderRadius:10,fontWeight:700,cursor:'pointer',fontSize:'0.9rem'}}>
+                    {lang==='he'?'שמור שינויים':'Save Changes'}
+                  </button>
+                  <button onClick={()=>setEditing(false)}
+                    style={{padding:'8px 18px',background:'#f0f2f5',color:'#333',border:'none',borderRadius:10,fontWeight:700,cursor:'pointer',fontSize:'0.9rem'}}>
+                    {lang==='he'?'ביטול':'Cancel'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20,marginBottom:28}}>
             <div style={{background:'#f8f9fb',padding:20,borderRadius:12,border:'1px solid #e8eaf0'}}>
               <h3 style={{color:'#EAB21B',marginBottom:14,fontFamily:'Georgia,serif',letterSpacing:1}}>{tx.eventDetails}</h3>
-              <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                <div><strong style={{color:'#333'}}>{tx.date}</strong> <span>{contract.eventDate?new Date(contract.eventDate).toLocaleDateString(lang==='he'?'he-IL':'en-US'):'-'}</span></div>
-                <div><strong style={{color:'#333'}}>{tx.location}</strong> <span>{contract.eventLocation||'-'}</span></div>
-                <div><strong style={{color:'#333'}}>{tx.groom}</strong> <span>{contract.groomName||'-'}</span></div>
-                <div><strong style={{color:'#333'}}>{tx.bride}</strong> <span>{contract.brideName||'-'}</span></div>
+              <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                <div style={{display:'flex',flexDirection:'column',gap:3}}>
+                  <strong style={{color:'#555',fontSize:'0.85rem'}}>{tx.date}</strong>
+                  {editing
+                    ? <input type="date" value={editedFields.eventDate||''} onChange={e=>setEditedFields(f=>({...f,eventDate:e.target.value}))} style={{padding:'5px 8px',border:'1px solid #ccc',borderRadius:6,fontSize:'0.9rem',color:'#1a1a2e'}}/>
+                    : <span style={{color:'#1a1a2e',fontWeight:500}}>{contract.eventDate?new Date(contract.eventDate).toLocaleDateString(lang==='he'?'he-IL':'en-US'):'-'}</span>}
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:3}}>
+                  <strong style={{color:'#555',fontSize:'0.85rem'}}>{tx.location}</strong>
+                  {editing
+                    ? <input value={editedFields.eventLocation||''} onChange={e=>setEditedFields(f=>({...f,eventLocation:e.target.value}))} style={{padding:'5px 8px',border:'1px solid #ccc',borderRadius:6,fontSize:'0.9rem',color:'#1a1a2e'}}/>
+                    : <span style={{color:'#1a1a2e',fontWeight:500}}>{contract.eventLocation||'-'}</span>}
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:3}}>
+                  <strong style={{color:'#555',fontSize:'0.85rem'}}>{tx.groom}</strong>
+                  {editing
+                    ? <input value={editedFields.groomName||''} onChange={e=>setEditedFields(f=>({...f,groomName:e.target.value}))} style={{padding:'5px 8px',border:'1px solid #ccc',borderRadius:6,fontSize:'0.9rem',color:'#1a1a2e'}}/>
+                    : <span style={{color:'#1a1a2e',fontWeight:500}}>{contract.groomName||'-'}</span>}
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:3}}>
+                  <strong style={{color:'#555',fontSize:'0.85rem'}}>{tx.bride}</strong>
+                  {editing
+                    ? <input value={editedFields.brideName||''} onChange={e=>setEditedFields(f=>({...f,brideName:e.target.value}))} style={{padding:'5px 8px',border:'1px solid #ccc',borderRadius:6,fontSize:'0.9rem',color:'#1a1a2e'}}/>
+                    : <span style={{color:'#1a1a2e',fontWeight:500}}>{contract.brideName||'-'}</span>}
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:3,paddingTop:8,borderTop:'1px solid #e8eaf0'}}>
+                  <strong style={{color:'#555',fontSize:'0.85rem'}}>{tx.duration}</strong>
+                  {editing
+                    ? <div style={{display:'flex',alignItems:'center',gap:6}}>
+                        <input type="number" step="0.5" min="0.5" max="12" value={editedFields.performanceDuration||4.5}
+                          onChange={e=>setEditedFields(f=>({...f,performanceDuration:parseFloat(e.target.value)||4.5}))}
+                          style={{width:70,padding:'5px 8px',border:'1px solid #ccc',borderRadius:6,fontSize:'0.9rem',color:'#1a1a2e'}}/>
+                        <span style={{color:'#555',fontSize:'0.85rem'}}>{tx.hours}</span>
+                      </div>
+                    : <span style={{color:'#1a1a2e',fontWeight:600}}>{contract.performanceDuration||4.5} {tx.hours}</span>}
+                </div>
               </div>
             </div>
             <div style={{background:'#f8f9fb',padding:20,borderRadius:12,border:'1px solid #e8eaf0'}}>
               <h3 style={{color:'#EAB21B',marginBottom:14,fontFamily:'Georgia,serif',letterSpacing:1}}>{tx.ordererDetails}</h3>
-              <div style={{display:'flex',flexDirection:'column',gap:8}}>
-                <div><strong style={{color:'#333'}}>{tx.orderer}</strong> <span>{contract.ordererName}</span></div>
-                {contract.ordererIdNumber&&<div><strong style={{color:'#333'}}>ת.ז:</strong> <span>{contract.ordererIdNumber}</span></div>}
-                <div><strong style={{color:'#333'}}>{tx.address}</strong> <span>{contract.ordererAddress||'-'}</span></div>
-                <div><strong style={{color:'#333'}}>{tx.phone}</strong> <span>{contract.ordererPhone||'-'}</span></div>
+              <div style={{display:'flex',flexDirection:'column',gap:10}}>
+                <div style={{display:'flex',flexDirection:'column',gap:3}}>
+                  <strong style={{color:'#555',fontSize:'0.85rem'}}>{tx.orderer}</strong>
+                  {editing
+                    ? <input value={editedFields.ordererName||''} onChange={e=>setEditedFields(f=>({...f,ordererName:e.target.value}))} style={{padding:'5px 8px',border:'1px solid #ccc',borderRadius:6,fontSize:'0.9rem',color:'#1a1a2e'}}/>
+                    : <span style={{color:'#1a1a2e',fontWeight:500}}>{contract.ordererName||'-'}</span>}
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:3}}>
+                  <strong style={{color:'#555',fontSize:'0.85rem'}}>{tx.idNumber}</strong>
+                  {editing
+                    ? <input value={editedFields.ordererIdNumber||''} onChange={e=>setEditedFields(f=>({...f,ordererIdNumber:e.target.value}))} style={{padding:'5px 8px',border:'1px solid #ccc',borderRadius:6,fontSize:'0.9rem',color:'#1a1a2e'}}/>
+                    : <span style={{color:'#1a1a2e',fontWeight:500}}>{contract.ordererIdNumber||'-'}</span>}
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:3}}>
+                  <strong style={{color:'#555',fontSize:'0.85rem'}}>{tx.address}</strong>
+                  {editing
+                    ? <input value={editedFields.ordererAddress||''} onChange={e=>setEditedFields(f=>({...f,ordererAddress:e.target.value}))} style={{padding:'5px 8px',border:'1px solid #ccc',borderRadius:6,fontSize:'0.9rem',color:'#1a1a2e'}}/>
+                    : <span style={{color:'#1a1a2e',fontWeight:500}}>{contract.ordererAddress||'-'}</span>}
+                </div>
+                <div style={{display:'flex',flexDirection:'column',gap:3}}>
+                  <strong style={{color:'#555',fontSize:'0.85rem'}}>{tx.phone}</strong>
+                  {editing
+                    ? <input value={editedFields.ordererPhone||''} onChange={e=>setEditedFields(f=>({...f,ordererPhone:e.target.value}))} style={{padding:'5px 8px',border:'1px solid #ccc',borderRadius:6,fontSize:'0.9rem',color:'#1a1a2e'}}/>
+                    : <span style={{color:'#1a1a2e',fontWeight:500}}>{contract.ordererPhone||'-'}</span>}
+                </div>
               </div>
             </div>
           </div>
