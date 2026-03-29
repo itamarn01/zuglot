@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kolot CRM - מערכת ניהול להקת קולות</title>
+    <meta name="description" content="מערכת CRM מקצועית לניהול לידים, חוזים ואירועים של להקת קולות" />
+    <meta name="keywords" content="קולות, להקה, CRM, ניהול אירועים, חוזים" />
+    <meta name="author" content="להקת קולות" />
+    <meta property="og:title" content="Kolot CRM - להקת קולות" />
+    <meta property="og:description" content="מערכת ניהול לידים וחוזים של להקת קולות" />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#1a1a2e" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <style>
+      #splash-screen {
+        position: fixed;
+        inset: 0;
+        background: #0a0a0a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+      #splash-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      .splash-logo {
+        font-family: 'Georgia', serif;
+        font-size: 5rem;
+        color: #EAB21B;
+        letter-spacing: 12px;
+        font-weight: 900;
+        text-shadow: 0 0 40px rgba(234,178,27,0.5);
+        animation: splashPulse 1.5s ease-in-out infinite;
+      }
+      .splash-sub {
+        font-family: 'Georgia', serif;
+        font-size: 1rem;
+        color: #81C7D5;
+        letter-spacing: 6px;
+        margin-top: 8px;
+        text-transform: uppercase;
+      }
+      .splash-bar {
+        width: 200px;
+        height: 3px;
+        background: #1a1a2e;
+        border-radius: 2px;
+        margin-top: 40px;
+        overflow: hidden;
+      }
+      .splash-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #EAB21B, #81C7D5);
+        border-radius: 2px;
+        animation: splashLoad 1.2s ease-in-out forwards;
+      }
+      @keyframes splashPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+      }
+      @keyframes splashLoad {
+        from { width: 0; }
+        to { width: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash-screen">
+      <div class="splash-logo">KOLOT</div>
+      <div class="splash-sub">TURN IT UP.</div>
+      <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const splash = document.getElementById('splash-screen');
+          if (splash) splash.classList.add('hidden');
+        }, 1400);
+      });
+    </script>
+  </body>
+</html>
