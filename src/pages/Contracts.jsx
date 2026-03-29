@@ -30,13 +30,18 @@ const Contracts = () => {
   const [leadDropdownOpen, setLeadDropdownOpen] = useState(false);
   const leadSearchRef = useRef();
   const [copiedId, setCopiedId] = useState(null);
+  const [availableSignatures, setAvailableSignatures] = useState([]);
+  const [selectedSigIds, setSelectedSigIds] = useState([]);
 
   useEffect(() => { fetchAll(); }, []);
 
   const fetchAll = async () => {
     try {
-      const [c,l,pk] = await Promise.all([api.get('/contracts'), api.get('/leads'), api.get('/packages')]);
+      const [c,l,pk,cfg] = await Promise.all([api.get('/contracts'), api.get('/leads'), api.get('/packages'), api.get('/forms/config')]);
       setContracts(c.data); setLeads(l.data); setPackages(pk.data);
+      const sigs = cfg.data?.bandSignatures || [];
+      setAvailableSignatures(sigs);
+      setSelectedSigIds(sigs.map(s=>s._id)); // default: all selected
       const lid = params.get('leadId');
       if(lid) { prefillFromLead(lid, l.data); setShowModal(true); }
     } catch(e){} finally { setLoading(false); }
@@ -84,7 +89,15 @@ const Contracts = () => {
 
   const submit = async (e) => {
     e.preventDefault();
-    const payload = {...form, basePrice:Number(form.basePrice)||0, discount:Number(form.discount)||0, totalPrice:Number(form.totalPrice)||0, advancePayment:Number(form.advancePayment)||0};
+    const chosenSigs = availableSignatures.filter(s => selectedSigIds.includes(s._id));
+    const payload = {
+      ...form,
+      basePrice: Number(form.basePrice)||0,
+      discount: Number(form.discount)||0,
+      totalPrice: Number(form.totalPrice)||0,
+      advancePayment: Number(form.advancePayment)||0,
+      bandSignatures: chosenSigs.map(s => ({ name: s.name, role: s.role, signatureUrl: s.signatureUrl }))
+    };
     if(editId) await api.put(`/contracts/${editId}`, payload);
     else await api.post('/contracts', payload);
     closeModal(); fetchAll();
@@ -116,6 +129,15 @@ const Contracts = () => {
       specialNotes:c.specialNotes||'', contractTerms:c.contractTerms||''
     });
     setShowModal(true);
+    // pre-select existing band signatures
+    if (c.bandSignatures && c.bandSignatures.length > 0) {
+      const matchedIds = availableSignatures
+        .filter(s => c.bandSignatures.some(cs => cs.name === s.name))
+        .map(s => s._id);
+      setSelectedSigIds(matchedIds.length ? matchedIds : availableSignatures.map(s => s._id));
+    } else {
+      setSelectedSigIds(availableSignatures.map(s => s._id));
+    }
   };
 
   const deleteContract = async (id) => {
@@ -326,6 +348,47 @@ const Contracts = () => {
               )}
 
               <div className="form-group" style={{marginTop:16}}><label className="form-label">הערות מיוחדות</label><textarea className="form-textarea" value={form.specialNotes} onChange={e=>setForm(f=>({...f,specialNotes:e.target.value}))}/></div>
+
+              {/* ── Band Signatures Selection ── */}
+              {availableSignatures.length > 0 && (
+                <div style={{marginTop:16}}>
+                  <label className="form-label" style={{marginBottom:8,display:'block'}}>
+                    ✍️ חתימות להקה בחוזה
+                    <span style={{fontSize:'0.78rem',color:'var(--text-muted)',fontWeight:400,marginRight:8}}>
+                      בחר אילו חתימות יופיעו בחוזה זה
+                    </span>
+                  </label>
+                  <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+                    {availableSignatures.map(sig => {
+                      const isSelected = selectedSigIds.includes(sig._id);
+                      return (
+                        <div key={sig._id}
+                          onClick={() => setSelectedSigIds(prev =>
+                            isSelected ? prev.filter(id=>id!==sig._id) : [...prev, sig._id]
+                          )}
+                          style={{
+                            cursor:'pointer', padding:'10px 14px', borderRadius:10, minWidth:130,
+                            border:`2px solid ${isSelected?'var(--accent-gold)':'var(--border)'}`,
+                            background: isSelected ? 'var(--accent-gold-dim)' : 'var(--bg-secondary)',
+                            transition:'all 0.2s', textAlign:'center', position:'relative'
+                          }}>
+                          {isSelected && (
+                            <div style={{position:'absolute',top:4,left:4,background:'var(--accent-gold)',borderRadius:'50%',width:18,height:18,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.7rem',fontWeight:900,color:'#000'}}>✓</div>
+                          )}
+                          <img src={sig.signatureUrl} alt={sig.name}
+                            style={{width:'100%',height:48,objectFit:'contain',background:'#fff',borderRadius:5,padding:3,marginBottom:6,border:'1px solid var(--border)'}}/>
+                          <div style={{fontSize:'0.82rem',fontWeight:700,color:'var(--text-primary)'}}>{sig.name}</div>
+                          {sig.role && <div style={{fontSize:'0.72rem',color:'var(--text-muted)'}}>{sig.role}</div>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div style={{marginTop:8,fontSize:'0.78rem',color:'var(--text-muted)'}}>
+                    {selectedSigIds.length} מתוך {availableSignatures.length} חתימות נבחרו
+                  </div>
+                </div>
+              )}
+
               <div className="modal-footer">
                 <button type="submit" className="btn btn-primary">{editId?'עדכן חוזה':'צור חוזה'}</button>
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>ביטול</button>

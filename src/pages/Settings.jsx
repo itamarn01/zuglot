@@ -12,6 +12,14 @@ const Settings = () => {
   const [saved, setSaved] = useState(false);
   const logoRef = useRef();
 
+  // Band Signatures state
+  const [sigName, setSigName] = useState('');
+  const [sigRole, setSigRole] = useState('');
+  const [showSigPad, setShowSigPad] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [addingSig, setAddingSig] = useState(false);
+  const sigCanvasRef = useRef();
+
   useEffect(() => { fetchHandlers(); fetchFormConfig(); }, []);
 
   const fetchHandlers = async () => { try { const {data}=await api.get('/handlers'); setHandlers(data); } catch(e){} };
@@ -43,6 +51,51 @@ const Settings = () => {
       setTimeout(()=>setSaved(false), 2000);
     } catch(e){ alert('שגיאה'); }
     finally { setSaving(false); }
+  };
+
+  // ── Signature pad handlers ──
+  const startSigDraw = (e) => {
+    const canvas = sigCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    ctx.beginPath(); ctx.moveTo(x, y); setIsDrawing(true);
+  };
+  const drawSig = (e) => {
+    if (!isDrawing) return; e.preventDefault();
+    const canvas = sigCanvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#1a1a2e';
+    ctx.lineTo(x, y); ctx.stroke();
+  };
+  const stopSigDraw = () => setIsDrawing(false);
+  const clearSigPad = () => { const c = sigCanvasRef.current; c.getContext('2d').clearRect(0,0,c.width,c.height); };
+
+  const saveBandSig = async () => {
+    if (!sigName.trim()) { alert('נא להזין שם'); return; }
+    const canvas = sigCanvasRef.current;
+    const blank = document.createElement('canvas');
+    blank.width = canvas.width; blank.height = canvas.height;
+    if (canvas.toDataURL() === blank.toDataURL()) { alert('נא לחתום'); return; }
+    setAddingSig(true);
+    try {
+      const { data } = await api.post('/forms/config/band-signatures', {
+        name: sigName, role: sigRole, signatureUrl: canvas.toDataURL()
+      });
+      setFormConfig(f => ({ ...f, bandSignatures: data }));
+      setSigName(''); setSigRole(''); setShowSigPad(false); clearSigPad();
+    } catch(e) { alert('שגיאה בשמירה'); }
+    finally { setAddingSig(false); }
+  };
+
+  const deleteBandSig = async (sigId) => {
+    if (!confirm('למחוק חתימה זו?')) return;
+    const { data } = await api.delete(`/forms/config/band-signatures/${sigId}`);
+    setFormConfig(f => ({ ...f, bandSignatures: data }));
   };
 
   return (
@@ -106,6 +159,46 @@ const Settings = () => {
         </div>
       )}
 
+      {/* ── BAND SIGNATURES ── */}
+      {formConfig && (
+        <div className="card" style={{marginBottom:24}}>
+          <div className="card-header">
+            <h3 className="card-title">✍️ חתימות נציגי הלהקה</h3>
+            <button className="btn btn-primary btn-sm" onClick={()=>setShowSigPad(true)}>
+              <FiPlus/> הוסף חתימה
+            </button>
+          </div>
+          <p style={{color:'var(--text-muted)',fontSize:'0.85rem',marginBottom:16}}>
+            החתימות שמוגדרות כאן יופיעו בחוזה בסקשיין "נציגי הלהקה". בכל חוזה תוכל לבחור אילו חתימות לצרף.
+          </p>
+
+          {/* Existing signatures grid */}
+          {(formConfig.bandSignatures || []).length === 0 ? (
+            <div style={{textAlign:'center',padding:'32px 16px',border:'2px dashed var(--border)',borderRadius:10,color:'var(--text-muted)'}}>
+              <div style={{fontSize:'2.5rem',marginBottom:8}}>✍️</div>
+              <p>אין עדיין חתימות. לחץ על "הוסף חתימה" כדי להוסיף את הראשונה.</p>
+            </div>
+          ) : (
+            <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:16}}>
+              {(formConfig.bandSignatures || []).map(sig => (
+                <div key={sig._id} style={{background:'var(--bg-secondary)',borderRadius:10,padding:16,border:'1px solid var(--border)',position:'relative'}}>
+                  <button onClick={()=>deleteBandSig(sig._id)}
+                    style={{position:'absolute',top:8,left:8,background:'rgba(192,57,43,0.15)',border:'none',color:'#e74c3c',borderRadius:'50%',width:26,height:26,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'0.8rem'}}>
+                    <FiTrash2/>
+                  </button>
+                  <div style={{textAlign:'center',marginBottom:8}}>
+                    <img src={sig.signatureUrl} alt={sig.name}
+                      style={{width:'100%',height:70,objectFit:'contain',background:'#fff',borderRadius:6,border:'1px solid var(--border)',padding:4}}/>
+                  </div>
+                  <div style={{fontWeight:700,color:'var(--text-primary)',fontSize:'0.9rem',textAlign:'center'}}>{sig.name}</div>
+                  {sig.role && <div style={{color:'var(--text-muted)',fontSize:'0.78rem',textAlign:'center',marginTop:2}}>{sig.role}</div>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Handlers */}
       <div className="card" style={{marginBottom:24}}>
         <div className="card-header">
@@ -153,8 +246,47 @@ const Settings = () => {
           </div>
         </div>
       )}
+
+      {/* ── Signature Pad Modal ── */}
+      {showSigPad && (
+        <div className="modal-overlay" style={{zIndex:1100}} onClick={()=>setShowSigPad(false)}>
+          <div className="modal" style={{maxWidth:460}} onClick={e=>e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">✍️ הוספת חתימה חדשה</h2>
+              <button className="modal-close" onClick={()=>setShowSigPad(false)}>✕</button>
+            </div>
+            <div style={{padding:'0 0 16px'}}>
+              <div className="form-row" style={{marginBottom:12}}>
+                <div className="form-group">
+                  <label className="form-label">שם *</label>
+                  <input className="form-input" value={sigName} onChange={e=>setSigName(e.target.value)} placeholder="שם שם חתן"/>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">תפקיד</label>
+                  <input className="form-input" value={sigRole} onChange={e=>setSigRole(e.target.value)} placeholder="מנהל, מוסיקאי..."/>
+                </div>
+              </div>
+              <p style={{color:'var(--text-muted)',fontSize:'0.82rem',marginBottom:10,textAlign:'center'}}>חתמו בתוך המסגרת</p>
+              <canvas ref={sigCanvasRef} width={400} height={120}
+                style={{border:'2px solid var(--border)',borderRadius:10,background:'#fff',cursor:'crosshair',touchAction:'none',display:'block',width:'100%'}}
+                onMouseDown={startSigDraw} onMouseMove={drawSig} onMouseUp={stopSigDraw} onMouseLeave={stopSigDraw}
+                onTouchStart={startSigDraw} onTouchMove={drawSig} onTouchEnd={stopSigDraw}/>
+              <div style={{textAlign:'center',marginTop:8}}>
+                <button onClick={clearSigPad} className="btn btn-secondary btn-sm">נקה</button>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-primary" onClick={saveBandSig} disabled={addingSig}>
+                {addingSig ? 'שומר...' : '✓ שמור חתימה'}
+              </button>
+              <button className="btn btn-secondary" onClick={()=>setShowSigPad(false)}>ביטול</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default Settings;
+
