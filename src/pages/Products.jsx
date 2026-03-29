@@ -30,6 +30,15 @@ const Products = () => {
     finally { setLoading(false); }
   };
 
+  // Image crop editor state
+  const [showCropEditor, setShowCropEditor] = useState(false);
+  const [cropImage, setCropImage] = useState(''); // raw image data url
+  const [cropPos, setCropPos] = useState({ x: 50, y: 50 }); // percent
+  const [cropZoom, setCropZoom] = useState(100); // percent
+  const [dragging, setDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const cropRef = useRef();
+
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -37,8 +46,10 @@ const Products = () => {
     try {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImagePreview(reader.result);
-        setForm(f => ({...f, imageUrl: reader.result}));
+        setCropImage(reader.result);
+        setCropPos({ x: 50, y: 50 });
+        setCropZoom(100);
+        setShowCropEditor(true);
         setUploading(false);
       };
       reader.readAsDataURL(file);
@@ -46,6 +57,44 @@ const Products = () => {
       setUploading(false);
     }
   };
+
+  const applyCrop = () => {
+    // Render a cropped canvas
+    const img = new Image();
+    img.onload = () => {
+      const zoom = cropZoom / 100;
+      const displayW = 400;
+      const displayH = 200;
+      const srcW = img.width / zoom;
+      const srcH = img.height / zoom;
+      const srcX = Math.max(0, (img.width - srcW) * (cropPos.x / 100));
+      const srcY = Math.max(0, (img.height - srcH) * (cropPos.y / 100));
+      const canvas = document.createElement('canvas');
+      canvas.width = displayW;
+      canvas.height = displayH;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, srcX, srcY, Math.min(srcW, img.width - srcX), Math.min(srcH, img.height - srcY), 0, 0, displayW, displayH);
+      const result = canvas.toDataURL('image/jpeg', 0.92);
+      setImagePreview(result);
+      setForm(f => ({...f, imageUrl: result}));
+      setShowCropEditor(false);
+    };
+    img.src = cropImage;
+  };
+
+  const onCropMouseDown = (e) => {
+    setDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+    e.preventDefault();
+  };
+  const onCropMouseMove = (e) => {
+    if (!dragging) return;
+    const dx = (e.clientX - dragStart.x) / 3;
+    const dy = (e.clientY - dragStart.y) / 3;
+    setCropPos(p => ({ x: Math.max(0, Math.min(100, p.x - dx)), y: Math.max(0, Math.min(100, p.y - dy)) }));
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
+  const onCropMouseUp = () => setDragging(false);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -182,6 +231,58 @@ const Products = () => {
                 <button type="button" className="btn btn-secondary" onClick={closeModal}>ביטול</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Crop Editor Modal */}
+      {showCropEditor && (
+        <div className="modal-overlay" style={{zIndex:1100}}>
+          <div className="modal" style={{maxWidth:500}} onClick={e=>e.stopPropagation()}>
+            <div className="modal-header">
+              <h2 className="modal-title">עריכת תמונה</h2>
+              <button className="modal-close" onClick={()=>setShowCropEditor(false)}>✕</button>
+            </div>
+            <div style={{padding:'0 0 16px'}}>
+              <p style={{color:'var(--text-secondary)',fontSize:'0.85rem',marginBottom:12,textAlign:'center'}}>
+                גרור את התמונה כדי למרכז את החלק הרצוי • השתמש בסליידר לשינוי גודל
+              </p>
+              {/* Preview area */}
+              <div ref={cropRef}
+                style={{width:'100%',height:220,overflow:'hidden',borderRadius:10,cursor:dragging?'grabbing':'grab',userSelect:'none',position:'relative',background:'#000'}}
+                onMouseDown={onCropMouseDown}
+                onMouseMove={onCropMouseMove}
+                onMouseUp={onCropMouseUp}
+                onMouseLeave={onCropMouseUp}>
+                <img src={cropImage} alt="crop" draggable={false}
+                  style={{
+                    width:`${cropZoom}%`,
+                    height:`${cropZoom}%`,
+                    objectFit:'cover',
+                    position:'absolute',
+                    top:`${cropPos.y * (1 - cropZoom/100)}%`,
+                    left:`${cropPos.x * (1 - cropZoom/100)}%`,
+                    pointerEvents:'none',
+                    transition: dragging ? 'none' : 'all 0.1s',
+                  }}/>
+                {/* Center guide */}
+                <div style={{position:'absolute',inset:0,pointerEvents:'none',
+                  background:'radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.3) 100%)',
+                  border:'2px dashed rgba(234,178,27,0.6)',borderRadius:10}}/>
+              </div>
+              {/* Zoom control */}
+              <div style={{display:'flex',alignItems:'center',gap:12,marginTop:16,padding:'0 4px'}}>
+                <span style={{color:'var(--text-secondary)',fontSize:'0.85rem',whiteSpace:'nowrap'}}>🔍 זום:</span>
+                <input type="range" min="100" max="300" value={cropZoom}
+                  onChange={e=>setCropZoom(Number(e.target.value))}
+                  style={{flex:1,accentColor:'var(--accent-gold)'}}/>
+                <span style={{color:'var(--accent-gold)',fontSize:'0.85rem',fontWeight:700,minWidth:40}}>{cropZoom}%</span>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-primary" onClick={applyCrop}>✓ אישור</button>
+              <button className="btn btn-secondary" onClick={()=>setShowCropEditor(false)}>ביטול</button>
+            </div>
           </div>
         </div>
       )}

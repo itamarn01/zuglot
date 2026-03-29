@@ -13,7 +13,8 @@ const ContractSkeleton = () => (
 
 const emptyForm = {
   leadId:'', packageId:'', packageName:'', ordererName:'', ordererIdNumber:'', ordererAddress:'', ordererPhone:'',
-  groomName:'', brideName:'', eventDate:'', eventLocation:'', products:[], basePrice:0, discount:0, totalPrice:'', advancePayment:'', specialNotes:'', contractTerms:''
+  groomName:'', brideName:'', eventDate:'', eventLocation:'', performanceDuration: 4.5,
+  products:[], basePrice:0, discount:0, totalPrice:'', advancePayment:'', specialNotes:'', contractTerms:''
 };
 
 const Contracts = () => {
@@ -108,6 +109,7 @@ const Contracts = () => {
       groomName:c.groomName||'', brideName:c.brideName||'',
       eventDate:c.eventDate?c.eventDate.split('T')[0]:'',
       eventLocation:c.eventLocation||'',
+      performanceDuration:c.performanceDuration||4.5,
       products:c.products||[], basePrice:c.basePrice||c.totalPrice||0,
       discount:c.discount||0, totalPrice:c.totalPrice||0,
       advancePayment:c.advancePayment||0,
@@ -256,6 +258,14 @@ const Contracts = () => {
                 <div className="form-group"><label className="form-label">תאריך</label><input className="form-input" type="date" value={form.eventDate} onChange={e=>setForm(f=>({...f,eventDate:e.target.value}))}/></div>
                 <div className="form-group"><label className="form-label">מיקום</label><input className="form-input" value={form.eventLocation} onChange={e=>setForm(f=>({...f,eventLocation:e.target.value}))}/></div>
               </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">זמן נגינה (שעות)</label>
+                  <input className="form-input" type="number" step="0.5" min="0.5" max="12" value={form.performanceDuration}
+                    onChange={e=>setForm(f=>({...f,performanceDuration:parseFloat(e.target.value)||4.5}))}/>
+                  <div style={{fontSize:'0.78rem',color:'var(--text-muted)',marginTop:3}}>ברירת מחדל: 4.5 שעות</div>
+                </div>
+              </div>
 
               {/* Pricing Section */}
               <h4 style={{color:'var(--accent-cyan)',margin:'12px 0 8px'}}>מחיר</h4>
@@ -290,12 +300,28 @@ const Contracts = () => {
               )}
               {optionalProds.length>0&&(
                 <div>
-                  <h4 style={{color:'var(--warning)',margin:'12px 0 6px'}}>תוספות אופציונליות</h4>
-                  {optionalProds.map((p,i)=>(
-                    <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:8,background:'rgba(255,152,0,0.05)',border:'1px dashed var(--warning)',borderRadius:6,marginBottom:4,opacity:0.8}}>
-                      <span>{p.name}</span><span style={{color:'var(--warning)'}}>+₪{p.price?.toLocaleString()}</span>
-                    </div>
-                  ))}
+                  <h4 style={{color:'var(--warning)',margin:'12px 0 6px'}}>תוספות אופציונליות (ניתן לשנות מחיר)</h4>
+                  {optionalProds.map((p,i)=>{
+                    const globalIdx = form.products.findIndex((fp,fi)=>fp.isOptional&&form.products.filter(x=>x.isOptional).indexOf(fp)===i);
+                    const realIdx = form.products.indexOf(p);
+                    return (
+                      <div key={i} style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'8px 10px',background:'rgba(255,152,0,0.05)',border:'1px dashed var(--warning)',borderRadius:6,marginBottom:4,gap:12}}>
+                        <span style={{flex:1,color:'var(--text-primary)'}}>{p.name}</span>
+                        <div style={{display:'flex',alignItems:'center',gap:6}}>
+                          <span style={{color:'var(--text-muted)',fontSize:'0.85rem'}}>₪</span>
+                          <input type="number" min="0"
+                            style={{width:90,padding:'4px 8px',background:'var(--bg-secondary)',border:'1px solid var(--warning)',borderRadius:6,color:'var(--text-primary)',fontSize:'0.9rem',textAlign:'center'}}
+                            value={p.price||0}
+                            onChange={e=>{
+                              const newProducts=[...form.products];
+                              newProducts[realIdx]={...newProducts[realIdx],price:Number(e.target.value)||0};
+                              setForm(f=>({...f,products:newProducts}));
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
 
