@@ -125,6 +125,30 @@ const PublicForm = () => {
 
   const getField = (name) => config.fields?.find(f=>f.name===name);
 
+  const translateOption = (val) => {
+    if (!val || lang === 'he') return val;
+    const map = {
+      // Event Types
+      'חתונה': 'Wedding',
+      'בר מצווה': 'Bar Mitzvah',
+      'בת מצווה': 'Bat Mitzvah',
+      'ברית': 'Brit',
+      'אירוע עסקי': 'Corporate Event',
+      'אירוע חברה': 'Corporate Event',
+      'אחר': 'Other',
+      // How heard
+      'פייסבוק': 'Facebook',
+      'אינסטגרם': 'Instagram',
+      'טיקטוק': 'TikTok',
+      'גוגל': 'Google',
+      'יוטיוב': 'YouTube',
+      'המלצה': 'Recommendation',
+      'ראיתי באירוע': 'Saw at an event',
+      'מפה לאוזן': 'Word of Mouth',
+    };
+    return map[val] || val;
+  };
+
   if(submitted) return (
     <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:bg,direction:isRtl?'rtl':'ltr',padding:20}}>
       <div style={{textAlign:'center',maxWidth:500}}>
@@ -186,7 +210,7 @@ const PublicForm = () => {
                         onFocus={e=>e.currentTarget.style.borderColor=accent}
                         onBlur={e=>e.currentTarget.style.borderColor='rgba(255,255,255,0.15)'}>
                         <option value="">{isRtl?'בחרו...':'Choose...'}</option>
-                        {field.options?.map(o=><option key={o} value={o}>{o}</option>)}
+                        {field.options?.map(o=><option key={o} value={o}>{translateOption(o)}</option>)}
                       </select>
                     ):field.type==='textarea'?(
                       <textarea value={form[field.name]||''} onChange={e=>setForm(f=>({...f,[field.name]:e.target.value}))} required={field.required}

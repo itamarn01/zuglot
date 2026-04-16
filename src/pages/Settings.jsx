@@ -156,6 +156,33 @@ const Settings = () => {
             <div className="form-group"><label className="form-label">צבע רקע</label><input className="form-input" type="color" value={formConfig.backgroundColor||'#0a0a0a'} onChange={e=>setFormConfig(f=>({...f,backgroundColor:e.target.value}))}/></div>
             <div className="form-group"><label className="form-label">צבע אקסנט</label><input className="form-input" type="color" value={formConfig.accentColor||'#EAB21B'} onChange={e=>setFormConfig(f=>({...f,accentColor:e.target.value}))}/></div>
           </div>
+
+          {/* WordPress Webhook */}
+          <div style={{marginTop:20,padding:'16px',background:'var(--bg-secondary)',borderRadius:10,border:'1px solid var(--border)'}}>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
+              <span style={{fontSize:'1.2rem'}}>🔗</span>
+              <label className="form-label" style={{margin:0,color:'var(--accent-gold)'}}>WordPress Webhook URL</label>
+            </div>
+            <p style={{color:'var(--text-muted)',fontSize:'0.82rem',marginBottom:10}}>
+              כל פנייה חדשה תישלח אוטומטית ל-WordPress שלך. ב-WordPress, התקן פלאגין כמו WPForms / FluentForms / Webhook.site וצור endpoint שמקבל POST בפורמט JSON.
+            </p>
+            <input
+              className="form-input"
+              placeholder="https://yoursite.com/wp-json/custom/v1/lead-webhook"
+              value={formConfig.webhookUrl||''}
+              onChange={e=>setFormConfig(f=>({...f,webhookUrl:e.target.value}))}
+              dir="ltr"
+            />
+            {formConfig.webhookUrl && (
+              <div style={{marginTop:8,fontSize:'0.8rem',color:'var(--success)'}}>
+                ✅ Webhook מוגדר - יופעל בכל פנייה חדשה
+              </div>
+            )}
+            <div style={{marginTop:10,padding:'10px 14px',background:'var(--bg-card)',borderRadius:8,fontSize:'0.78rem',color:'var(--text-muted)',direction:'ltr',fontFamily:'monospace'}}>
+              <div style={{color:'var(--accent-cyan)',marginBottom:4}}>// Payload example sent to WordPress:</div>
+              <div>{'{'} "event": "new_lead", "full_name": "...", "phone": "...", "email": "...", "event_type": "חתונה" {'}'}</div>
+            </div>
+          </div>
         </div>
       )}
 
